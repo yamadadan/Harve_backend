@@ -1,0 +1,359 @@
+-- phpMyAdmin SQL Dump
+-- version 5.0.2
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Tempo de geraÃ§Ã£o: 15-Maio-2024 Ã s 23:00
+-- VersÃ£o do servidor: 10.4.33-MariaDB-1:10.4.33+maria~ubu2004
+-- versÃ£o do PHP: 7.4.33
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `fdw_modelo`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `caracteristicaproduto`
+--
+
+CREATE TABLE IF NOT EXISTS `caracteristicaproduto` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  `idtipocaracteristica` int(11) NOT NULL,
+  `caminhoimagem` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tipocaracteristica_caracteristicaproduto` (`idtipocaracteristica`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `categoriaproduto`
+--
+
+CREATE TABLE IF NOT EXISTS `categoriaproduto` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Extraindo dados da tabela `categoriaproduto`
+--
+
+INSERT INTO `categoriaproduto` (`id`, `nome`) VALUES
+(1, 'EletrÃ´nicos'),
+(2, 'MÃ³veis');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `cidade`
+--
+
+CREATE TABLE IF NOT EXISTS `cidade` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) NOT NULL,
+  `uf` varchar(2) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `cupomdesconto`
+--
+
+CREATE TABLE IF NOT EXISTS `cupomdesconto` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(100) NOT NULL,
+  `descontoporcentagem` float NOT NULL,
+  `idusuario` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `usuario_cupomdesconto` (`idusuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `imagemprodutofisico`
+--
+
+CREATE TABLE IF NOT EXISTS `imagemprodutofisico` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `caminhoimagem` varchar(2000) NOT NULL,
+  `idprodutofisico` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `produtofisico_imagem` (`idprodutofisico`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `log`
+--
+
+CREATE TABLE IF NOT EXISTS `log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pagina` varchar(1000) NOT NULL,
+  `idusuario` int(11) NOT NULL,
+  `data` date NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `marca`
+--
+
+CREATE TABLE IF NOT EXISTS `marca` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `meiopagamento`
+--
+
+CREATE TABLE IF NOT EXISTS `meiopagamento` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) NOT NULL,
+  `ativo` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `pedido`
+--
+
+CREATE TABLE IF NOT EXISTS `pedido` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idusuario` int(11) NOT NULL,
+  `idcupomdesconto` int(11) DEFAULT NULL,
+  `idmeiopagamento` int(11) DEFAULT NULL,
+  `valortotal` float NOT NULL,
+  `enderecoentrega` varchar(1000) DEFAULT NULL,
+  `numeroentrega` varchar(100) DEFAULT NULL,
+  `idcidadeentrega` int(11) DEFAULT NULL,
+  `compentrega` varchar(100) DEFAULT NULL,
+  `bairroentrega` varchar(100) DEFAULT NULL,
+  `cepentrega` varchar(10) DEFAULT NULL,
+  `ehentrega` tinyint(1) NOT NULL,
+  `observacao` text DEFAULT NULL,
+  `datapedido` date NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `cidade_pedido` (`idcidadeentrega`),
+  KEY `usuario_pedido` (`idusuario`),
+  KEY `cupomdesconto_pedido` (`idcupomdesconto`),
+  KEY `meiopagamento_pedido` (`idmeiopagamento`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `pedido_produtofisico`
+--
+
+CREATE TABLE IF NOT EXISTS `pedido_produtofisico` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idpedido` int(11) NOT NULL,
+  `idprodutofisico` int(11) NOT NULL,
+  `valortotal` float NOT NULL,
+  `qtde` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `pedido_ppf` (`idpedido`),
+  KEY `produtofisico_ppf` (`idprodutofisico`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `produtofisico`
+--
+
+CREATE TABLE IF NOT EXISTS `produtofisico` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `qtde` int(11) NOT NULL,
+  `idprodutos` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `produtos_produtofisico` (`idprodutos`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `produtofisico_caracteristicaproduto`
+--
+
+CREATE TABLE IF NOT EXISTS `produtofisico_caracteristicaproduto` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idcaracteristicaproduto` int(11) NOT NULL,
+  `idprodutofisico` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `produtofisico_pfcp` (`idprodutofisico`),
+  KEY `caracteristicaproduto_pfcp` (`idcaracteristicaproduto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `produtos`
+--
+
+CREATE TABLE IF NOT EXISTS `produtos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  `ativo` tinyint(1) NOT NULL,
+  `preco` float NOT NULL,
+  `preco_desconto` float NOT NULL,
+  `idcategoriaproduto` int(11) NOT NULL,
+  `idmarca` int(11) NOT NULL,
+  `descricao` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `marca_produtos` (`idmarca`),
+  KEY `categoriaproduto` (`idcategoriaproduto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `tipocaracteristica`
+--
+
+CREATE TABLE IF NOT EXISTS `tipocaracteristica` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  `caminhoimagem` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `usuario`
+--
+
+CREATE TABLE IF NOT EXISTS `usuario` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(200) NOT NULL,
+  `cpfcnpj` varchar(100) NOT NULL,
+  `senha` varchar(100) NOT NULL,
+  `enderecofisico` varchar(1000) DEFAULT NULL,
+  `idcidadefisica` int(11) DEFAULT NULL,
+  `cepfisico` varchar(10) DEFAULT NULL,
+  `numerofisico` varchar(100) DEFAULT NULL,
+  `compfisico` varchar(100) DEFAULT NULL,
+  `bairrofisico` varchar(100) DEFAULT NULL,
+  `ativo` tinyint(1) NOT NULL,
+  `enderecofiscal` varchar(1000) DEFAULT NULL,
+  `idcidadefiscal` int(11) DEFAULT NULL,
+  `cepfiscal` varchar(10) DEFAULT NULL,
+  `numerofiscal` varchar(100) DEFAULT NULL,
+  `compfiscal` varchar(100) DEFAULT NULL,
+  `bairrofiscal` varchar(100) DEFAULT NULL,
+  `email` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `cidadefisica_usuario` (`idcidadefisica`),
+  KEY `cidadefiscal_usuario` (`idcidadefiscal`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `usuariosistema`
+--
+
+CREATE TABLE IF NOT EXISTS `usuariosistema` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` int(100) NOT NULL,
+  `senha` int(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- RestriÃ§Ãµes para despejos de tabelas
+--
+
+--
+-- Limitadores para a tabela `caracteristicaproduto`
+--
+ALTER TABLE `caracteristicaproduto`
+  ADD CONSTRAINT `tipocaracteristica_caracteristicaproduto` FOREIGN KEY (`idtipocaracteristica`) REFERENCES `tipocaracteristica` (`id`);
+
+--
+-- Limitadores para a tabela `cupomdesconto`
+--
+ALTER TABLE `cupomdesconto`
+  ADD CONSTRAINT `usuario_cupomdesconto` FOREIGN KEY (`idusuario`) REFERENCES `usuario` (`id`);
+
+--
+-- Limitadores para a tabela `imagemprodutofisico`
+--
+ALTER TABLE `imagemprodutofisico`
+  ADD CONSTRAINT `produtofisico_imagem` FOREIGN KEY (`idprodutofisico`) REFERENCES `produtofisico` (`id`);
+
+--
+-- Limitadores para a tabela `pedido`
+--
+ALTER TABLE `pedido`
+  ADD CONSTRAINT `cidade_pedido` FOREIGN KEY (`idcidadeentrega`) REFERENCES `cidade` (`id`),
+  ADD CONSTRAINT `cupomdesconto_pedido` FOREIGN KEY (`idcupomdesconto`) REFERENCES `cupomdesconto` (`id`),
+  ADD CONSTRAINT `meiopagamento_pedido` FOREIGN KEY (`idmeiopagamento`) REFERENCES `meiopagamento` (`id`),
+  ADD CONSTRAINT `usuario_pedido` FOREIGN KEY (`idusuario`) REFERENCES `usuario` (`id`);
+
+--
+-- Limitadores para a tabela `pedido_produtofisico`
+--
+ALTER TABLE `pedido_produtofisico`
+  ADD CONSTRAINT `pedido_ppf` FOREIGN KEY (`idpedido`) REFERENCES `pedido` (`id`),
+  ADD CONSTRAINT `produtofisico_ppf` FOREIGN KEY (`idprodutofisico`) REFERENCES `produtofisico` (`id`);
+
+--
+-- Limitadores para a tabela `produtofisico`
+--
+ALTER TABLE `produtofisico`
+  ADD CONSTRAINT `produtos_produtofisico` FOREIGN KEY (`idprodutos`) REFERENCES `produtos` (`id`);
+
+--
+-- Limitadores para a tabela `produtofisico_caracteristicaproduto`
+--
+ALTER TABLE `produtofisico_caracteristicaproduto`
+  ADD CONSTRAINT `caracteristicaproduto_pfcp` FOREIGN KEY (`idcaracteristicaproduto`) REFERENCES `caracteristicaproduto` (`id`),
+  ADD CONSTRAINT `produtofisico_pfcp` FOREIGN KEY (`idprodutofisico`) REFERENCES `produtofisico` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limitadores para a tabela `produtos`
+--
+ALTER TABLE `produtos`
+  ADD CONSTRAINT `categoriaproduto` FOREIGN KEY (`idcategoriaproduto`) REFERENCES `categoriaproduto` (`id`),
+  ADD CONSTRAINT `marca_produtos` FOREIGN KEY (`idmarca`) REFERENCES `marca` (`id`);
+
+--
+-- Limitadores para a tabela `usuario`
+--
+ALTER TABLE `usuario`
+  ADD CONSTRAINT `cidadefiscal_usuario` FOREIGN KEY (`idcidadefiscal`) REFERENCES `cidade` (`id`),
+  ADD CONSTRAINT `cidadefisica_usuario` FOREIGN KEY (`idcidadefisica`) REFERENCES `cidade` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
