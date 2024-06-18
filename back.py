@@ -2,6 +2,9 @@ from fastapi import FastAPI, Header, Query
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import pandas as pd
+from sqlalchemy import text, create_engine
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -28,6 +31,32 @@ categorias_produtos = [
 async def listar_categorias():
     return categorias_produtos
 
+# Rota para listar categorias de produtos
+@app.get("/listacategorias")
+async def listacategorias():
+    # Configurações de conexão
+    credenciais = {
+        "usuario": 'root',
+        "senha": 'teste',
+        "host": '127.0.0.1',
+        "port": int(3306),
+        "banco_de_dados": 'harve_backend'
+    }
+    STRING_CONEXAO = f"mysql+pymysql://{credenciais['usuario']}:{credenciais['senha']}@{credenciais['host']}:{credenciais['port']}/{credenciais['banco_de_dados']}"
+    query = 'SELECT * FROM categoriaproduto'
+    engine = create_engine(STRING_CONEXAO)
+    # Cria a engine
+    with engine.connect() as conexao:
+        listacategorias = pd.read_sql(text(query), conexao)
+    print(listacategorias)
+    return listacategorias.to_dict(orient='records')
+    # return {'message': 'Requisição com sucesso'}
+    # return listacategorias
+    # Converta o DataFrame para JSON
+    # data_json = listacategorias.to_json(orient='records')
+
+    # Retorne os dados como uma resposta JSON
+    # return JSONResponse(content=data_json)
 # Rota para obter uma categoria de produto específica pelo ID
 @app.get("/categorias-produtos/{categoria_id}", response_model=dict)
 async def obter_categoria(categoria_id: int):
